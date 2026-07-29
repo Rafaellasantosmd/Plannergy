@@ -5,7 +5,7 @@
 <!-- Metadados básicos da página: codificação, responsividade e título da aba. -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Maré · Calendário &amp; Energia</title>
+<title>Plannergy · Calendário &amp; Energia</title>
 <!-- Ícones usados nos botões, badges e indicadores visuais da interface. -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.3.0/dist/tabler-icons.min.css">
 <!-- Tipografia: Quicksand para títulos/identidade, Nunito para texto corrido. -->
@@ -471,13 +471,14 @@ function renderSidebar() {
 <aside class="sidebar ${sidebarOpen ? 'open' : ''}">
   <div class="sb-top">
     <button class="sb-toggle" onclick="toggleSidebar()" aria-label="${sidebarOpen ? 'Recolher menu' : 'Expandir menu'}"><i class="ti ti-chevron-right"></i></button>
-    <div class="sb-brand">Maré<small>calendário &amp; energia</small></div>
+    <div class="sb-brand">Plannergy<small>calendário &amp; energia</small></div>
   </div>
   <nav class="sb-nav">
     <button class="sb-item ${page === 'calendar' ? 'active' : ''}" onclick="setPage('calendar')">
       <i class="ti ti-calendar-event"></i><span>Calendário</span>
     </button>
     <div class="sb-subnav ${page === 'calendar' && sidebarOpen ? 'show' : ''}">
+      <button class="sb-sub-item ${view === '3day' ? 'active' : ''}" onclick="setView('daily')">Diario</button>
       <button class="sb-sub-item ${view === '3day' ? 'active' : ''}" onclick="setView('3day')">3 dias</button>
       <button class="sb-sub-item ${view === 'week' ? 'active' : ''}" onclick="setView('week')">Semana</button>
       <button class="sb-sub-item ${view === 'month' ? 'active' : ''}" onclick="setView('month')">Mês</button>
@@ -515,13 +516,13 @@ function renderCalendarPage() {
   <div class="tb-right">
     ${pillSwitchHTML()}
     <button class="btn-add" onclick="openCreate()"><i class="ti ti-plus"></i>Nova</button>
-  </div>
+  </div>Plannergy
 </div>
 <div class="content-row">
   <div class="cal-area">${renderCalendarBody()}</div>
   <div class="energy-side">
-    ${energyCardHTML('Social hoje', social, '👥')}
-    ${energyCardHTML('Física hoje', physical, '⚡')}
+    ${energyCardHTML('Energia Social', social, '👥')}
+    ${energyCardHTML('Energia Física', physical, '⚡')}
   </div>
 </div>`;
 }
@@ -631,7 +632,7 @@ function renderSettingsPage() {
   return `
 <div class="settings-wrap">
   <div class="settings-title">Configurações</div>
-  <div class="settings-sub">Como a Maré te chama e como sua energia anda hoje.</div>
+  <div class="settings-sub">Como a Plannergy te chama e como sua energia anda hoje.</div>
 
   <div class="setting-block">
     <div class="setting-label"><i class="ti ti-user"></i>Nome</div>
