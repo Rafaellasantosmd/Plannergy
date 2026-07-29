@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<!-- Define que este documento usa o padrão HTML5. -->
+<html lang="pt-BR">
+<head>
+<!-- Metadados básicos da página: codificação, responsividade e título da aba. -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Minhas Tarefas</title>
+<!-- Ícones usados nos botões, badges e indicadores visuais da interface. -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.3.0/dist/tabler-icons.min.css">
+<style>
+  /* Variáveis centrais de cor e aparência para manter o visual consistente. */
+  :root {
+    --pink-50: #FBEAF0;
+    --pink-100: #F4C0D1;
+    --pink-400: #D4537E;
+    --pink-600: #993556;
+    --pink-800: #72243E;
+    --pink-900: #4B1528;
+    --red-bg: #FCEBEB; --red-tc: #A32D2D;
+    --amber-bg: #FAEEDA; --amber-tc: #854F0B;
+    --teal-bg: #E1F5EE; --teal-tc: #0F6E56;
+    --surface: #ffffff;
+    --bg: #f7f2f4;
+    --text: #1a1a1a;
+    --text-muted: #666;
+    --border: rgba(0,0,0,0.12);
+    --card-shadow: 0 1px 3px rgba(0,0,0,0.07);
+  }
+  /* Reset simples para evitar diferenças de espaçamento entre navegadores. */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  /* Estilos globais da página: tipografia, fundo e área útil vertical. */
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0;
+  }
+  /* Container principal da aplicação, centralizado e com largura limitada. */
+  #app { max-width: 480px; margin: 0 auto; padding: 20px 16px 40px; }
+
+  /* Cabeçalho com o nome da lista e o botão para criar nova tarefa. */
+  .header {
+    background: var(--pink-50);
+    border: 0.5px solid var(--pink-100);
+    border-radius: 14px;
+    padding: 16px 18px 14px;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  /* Bloco de título e subtítulo do cabeçalho. */
+  .header-title { font-size: 16px; font-weight: 600; color: var(--pink-900); display: flex; align-items: center; gap: 7px; }
+  .header-subtitle { font-size: 12px; color: var(--pink-600); margin-top: 2px; }
+
+  /* Botão principal para abrir o modal de criação. */
+  .btn-add {
+    background: var(--pink-400);
+    color: white;
+    border: none;
+    border-radius: 9px;
+    padding: 8px 15px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: background .15s;
+  }
+  .btn-add:hover { background: var(--pink-600); }
+
+  /* Barra de filtros e ordenação da lista de tarefas. */
+  .controls { display: flex; align-items: center; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
+  /* Botões em formato de pílula para alternar entre estados da lista. */
+  .pill { font-size: 12px; padding: 4px 11px; border-radius: 20px; border: 0.5px solid var(--border); cursor: pointer; background: transparent; color: var(--text-muted); transition: all .15s; }
+  .pill.active { background: var(--pink-100); border-color: var(--pink-400); color: var(--pink-900); font-weight: 500; }
+  .pill:hover:not(.active) { background: #f0e8ec; }
+  select { font-size: 12px; padding: 4px 8px; border: 0.5px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--text); cursor: pointer; }
+
+  /* Lista vertical de tarefas. */
+  .task-list { display: flex; flex-direction: column; gap: 8px; }
+
+  /* Cartão individual de cada tarefa. */
+  .task-card {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: 13px;
+    padding: 12px 13px;
+    transition: opacity .2s;
+    box-shadow: var(--card-shadow);
+  }
+  .task-card.done { opacity: .55; }
+  /* Linha principal do cartão, agrupando checkbox, texto e ações. */
+  .task-row { display: flex; align-items: flex-start; gap: 10px; }
+
+  /* Círculo de marcação da tarefa concluída. */
+  .check-circle {
+    width: 18px; height: 18px; border-radius: 50%;
+    border: 2px solid var(--pink-100);
+    background: transparent; cursor: pointer;
+    flex-shrink: 0; margin-top: 2px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all .15s;
+  }
+  .check-circle.checked { background: var(--pink-400); border-color: var(--pink-400); }
+  .check-circle i { font-size: 9px; color: white; }
+
+  /* Área de conteúdo da tarefa: título, metadados e progresso. */
+  .task-info { flex: 1; min-width: 0; }
+  .task-title { font-size: 14px; font-weight: 500; color: var(--text); }
+  .task-title.done { text-decoration: line-through; }
+  .task-meta { display: flex; align-items: center; gap: 10px; margin-top: 4px; flex-wrap: wrap; }
+  .task-meta span { font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 2px; }
+  .task-meta span.urgent { color: var(--red-tc); font-weight: 500; }
+
+  /* Etiqueta que mostra a prioridade da tarefa. */
+  .badge { font-size: 11px; padding: 2px 8px; border-radius: 20px; font-weight: 500; margin-left: 4px; }
+  .badge.alta { background: var(--red-bg); color: var(--red-tc); }
+  .badge.media { background: var(--amber-bg); color: var(--amber-tc); }
+  .badge.baixa { background: var(--teal-bg); color: var(--teal-tc); }
+
+  /* Barra simples de progresso das subtarefas concluídas. */
+  .progress-bar { margin-top: 7px; height: 3px; background: #f0e8ec; border-radius: 2px; }
+  .progress-fill { height: 3px; border-radius: 2px; background: var(--pink-400); transition: width .3s; }
+
+  /* Ações rápidas do cartão: expandir subtarefas e excluir. */
+  .task-actions { display: flex; gap: 2px; flex-shrink: 0; align-items: center; }
+  .icon-btn { background: none; border: none; cursor: pointer; padding: 3px; color: var(--text-muted); display: flex; align-items: center; border-radius: 5px; transition: color .15s; }
+  .icon-btn:hover { color: var(--text); background: #f0e8ec; }
+  .icon-btn i { font-size: 16px; }
+
+  /* Lista de subtarefas exibida quando o cartão é expandido. */
+  .subtask-list { margin-top: 10px; padding-left: 28px; display: flex; flex-direction: column; gap: 7px; }
+  .subtask-row { display: flex; align-items: center; gap: 8px; }
+  .check-sq { width: 14px; height: 14px; border-radius: 3px; border: 1.5px solid var(--pink-100); background: transparent; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all .15s; }
+  .check-sq.checked { background: var(--pink-400); border-color: var(--pink-400); }
+  .check-sq i { font-size: 8px; color: white; }
+  .subtask-title { font-size: 13px; color: var(--text-muted); }
+  .subtask-title.done { text-decoration: line-through; }
+
+  /* Estado vazio quando não há tarefas para mostrar. */
+  .empty { text-align: center; padding: 2.5rem 1rem; color: var(--text-muted); font-size: 13px; background: #faf5f7; border-radius: 13px; border: 0.5px dashed var(--border); }
+
+  /* Modal de criação de tarefa: camada de fundo e janela central. */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.35); display: flex; align-items: center; justify-content: center; z-index: 999; }
+  .modal { background: var(--surface); border-radius: 16px; padding: 22px; width: 92%; max-width: 420px; border: 0.5px solid var(--border); box-shadow: 0 8px 32px rgba(0,0,0,.15); }
+  .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .modal-title { font-size: 15px; font-weight: 600; color: var(--text); }
+  /* Rótulos e grupos de campos do formulário do modal. */
+  .form-label { font-size: 12px; color: var(--text-muted); margin-bottom: 4px; display: block; }
+  .form-group { display: flex; flex-direction: column; margin-bottom: 12px; }
+  input[type=text], input[type=date], textarea, select.form-select {
+    font-size: 13px; padding: 8px 10px; border: 0.5px solid var(--border);
+    border-radius: 9px; background: var(--surface); color: var(--text);
+    width: 100%; font-family: inherit;
+  }
+  input[type=text]:focus, input[type=date]:focus, textarea:focus, select.form-select:focus {
+    outline: none; border-color: var(--pink-400);
+  }
+  /* Layout em duas colunas para prioridade e prazo. */
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+  /* Linha para adicionar subtarefas no modal. */
+  .sub-input-row { display: flex; gap: 6px; }
+  .sub-input-row input { flex: 1; }
+  .btn-sm { padding: 0 12px; height: 36px; border: 0.5px solid var(--border); border-radius: 9px; background: var(--surface); cursor: pointer; font-size: 13px; color: var(--text); display: flex; align-items: center; justify-content: center; }
+  .btn-sm:hover { background: #f0e8ec; }
+  /* Pré-visualização das subtarefas ainda não salvas. */
+  .sublist-preview { margin-top: 8px; display: flex; flex-direction: column; gap: 5px; }
+  .sublist-item { display: flex; align-items: center; gap: 7px; font-size: 13px; color: var(--text-muted); }
+  /* Rodapé do modal com ações de cancelar e confirmar. */
+  .modal-footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 6px; }
+  .btn-cancel { padding: 8px 16px; border: 0.5px solid var(--border); border-radius: 9px; background: transparent; cursor: pointer; font-size: 13px; color: var(--text); }
+  .btn-cancel:hover { background: #f0e8ec; }
+  .btn-submit { padding: 8px 20px; background: var(--pink-400); color: white; border: none; border-radius: 9px; cursor: pointer; font-size: 13px; font-weight: 500; }
+  .btn-submit:hover { background: var(--pink-600); }
+</style>
+</head>
+<body>
+<!-- Ponto de montagem da aplicação renderizada via JavaScript. -->
+<div id="app"></div>
+
+<script>
+// Chave usada para persistir as tarefas no localStorage.
+const SKEY = 'tw_tasks_gabi';
+// Mapa de prioridade com label, cor e ordem de exibição.
+const PRIO = {
+  alta: { label: 'Alta', bg: '#FCEBEB', tc: '#A32D2D', ord: 0 },
+  média: { label: 'Média', bg: '#FAEEDA', tc: '#854F0B', ord: 1 },
+  baixa: { label: 'Baixa', bg: '#E1F5EE', tc: '#0F6E56', ord: 2 }
+};
+
+// Estado principal da aplicação.
+let tasks = [], sortBy = 'prioridade', filterBy = 'pendentes';
+let showModal = false, editSubs = [], subInput = '';
+let expandedIds = new Set();
+
+// Carrega tarefas salvas do navegador, se existirem.
+function load() {
+  try { const r = localStorage.getItem(SKEY); if (r) tasks = JSON.parse(r); } catch {}
+}
+// Persiste tarefas e redesenha a interface.
+function save() {
+  try { localStorage.setItem(SKEY, JSON.stringify(tasks)); } catch {}
+  render();
+}
+
+// Converte a data de vencimento em um rótulo amigável para o usuário.
+function dateInfo(ds) {
+  if (!ds) return null;
+  const d = new Date(ds + 'T00:00:00'), t = new Date();
+  t.setHours(0, 0, 0, 0);
+  const diff = Math.round((d - t) / 86400000);
+  if (diff < 0) return { label: `${Math.abs(diff)}d atrasada`, urgent: true };
+  if (diff === 0) return { label: 'Hoje', urgent: true };
+  if (diff === 1) return { label: 'Amanhã', urgent: false };
+  if (diff <= 7) return { label: `Em ${diff} dias`, urgent: false };
+  return { label: d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }), urgent: false };
+}
+
+// Filtra e ordena a lista conforme as opções atuais da tela.
+function getSorted() {
+  let f = [...tasks];
+  if (filterBy === 'pendentes') f = f.filter(t => !t.done);
+  else if (filterBy === 'feitas') f = f.filter(t => t.done);
+  if (sortBy === 'prioridade') f.sort((a, b) => PRIO[a.priority].ord - PRIO[b.priority].ord);
+  else if (sortBy === 'prazo') f.sort((a, b) => {
+    if (!a.dueDate) return 1; if (!b.dueDate) return -1;
+    return new Date(a.dueDate) - new Date(b.dueDate);
+  });
+  else f.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  return f;
+}
+
+// Gera o HTML de um cartão de tarefa individual.
+function cardHTML(t) {
+  const di = dateInfo(t.dueDate);
+  const ds = t.subtasks.filter(s => s.done).length, ts = t.subtasks.length;
+  const pct = ts > 0 ? Math.round((ds / ts) * 100) : 0;
+  const exp = expandedIds.has(t.id);
+  const badgeClass = t.priority === 'alta' ? 'alta' : t.priority === 'baixa' ? 'baixa' : 'media';
+  return `
+<div class="task-card ${t.done ? 'done' : ''}" id="card_${t.id}">
+  <div class="task-row">
+    <button class="check-circle ${t.done ? 'checked' : ''}" onclick="toggleTask('${t.id}')" aria-label="${t.done ? 'Desmarcar' : 'Marcar como feita'}">
+      ${t.done ? '<i class="ti ti-check"></i>' : ''}
+    </button>
+    <div class="task-info">
+      <div style="display:flex;align-items:center;flex-wrap:wrap;gap:4px;">
+        <span class="task-title ${t.done ? 'done' : ''}">${t.title}</span>
+        <span class="badge ${badgeClass}">${PRIO[t.priority].label}</span>
+      </div>
+      <div class="task-meta">
+        ${di ? `<span class="${di.urgent ? 'urgent' : ''}"><i class="ti ti-calendar" style="font-size:12px;"></i>${di.label}</span>` : ''}
+        ${ts > 0 ? `<span><i class="ti ti-list-check" style="font-size:12px;"></i>${ds}/${ts} feitas</span>` : ''}
+        ${t.notes ? `<span title="${t.notes}"><i class="ti ti-notes" style="font-size:12px;"></i>${t.notes.length > 30 ? t.notes.slice(0, 30) + '…' : t.notes}</span>` : ''}
+      </div>
+      ${ts > 0 ? `<div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>` : ''}
+    </div>
+    <div class="task-actions">
+      ${ts > 0 ? `<button class="icon-btn" onclick="toggleExp('${t.id}')" aria-label="${exp ? 'Recolher' : 'Expandir'}"><i class="ti ti-chevron-${exp ? 'up' : 'down'}"></i></button>` : ''}
+      <button class="icon-btn" onclick="deleteTask('${t.id}')" aria-label="Excluir"><i class="ti ti-trash"></i></button>
+    </div>
+  </div>
+  ${exp && ts > 0 ? `<div class="subtask-list">${t.subtasks.map(s => `
+    <div class="subtask-row">
+      <button class="check-sq ${s.done ? 'checked' : ''}" onclick="toggleSub('${t.id}','${s.id}')" aria-label="${s.done ? 'Desmarcar' : 'Marcar'}">
+        ${s.done ? '<i class="ti ti-check"></i>' : ''}
+      </button>
+      <span class="subtask-title ${s.done ? 'done' : ''}">${s.title}</span>
+    </div>`).join('')}</div>` : ''}
+</div>`;
+}
+
+// Monta o HTML do modal de criação de tarefa.
+function modalHTML() {
+  return `
+<div class="modal-overlay" id="modal-overlay" onclick="overlayClick(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Nova tarefa</span>
+      <button class="icon-btn" onclick="closeModal()"><i class="ti ti-x" style="font-size:18px;"></i></button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Tarefa</label>
+      <input type="text" id="m-title" placeholder="O que precisa ser feito?">
+    </div>
+    <div class="form-row">
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Prioridade</label>
+        <select id="m-prio" class="form-select">
+          <option value="alta">Alta</option>
+          <option value="média" selected>Média</option>
+          <option value="baixa">Baixa</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Prazo</label>
+        <input type="date" id="m-date">
+      </div>
+    </div>
+    <div class="form-group" style="margin-top:12px;">
+      <label class="form-label">Obs (opcional)</label>
+      <input type="text" id="m-notes" placeholder="Alguma nota rápida?">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Subtarefas / O que falta fazer</label>
+      <div class="sub-input-row">
+        <input type="text" id="m-sub" placeholder="Adicionar passo..." onkeydown="subKey(event)">
+        <button class="btn-sm" onclick="addSub()"><i class="ti ti-plus"></i></button>
+      </div>
+      <div class="sublist-preview" id="m-sublist"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="btn-submit" onclick="submitTask()">Adicionar</button>
+    </div>
+  </div>
+</div>`;
+}
+
+// Atualiza a lista temporária de subtarefas exibida dentro do modal.
+function renderSublist() {
+  const el = document.getElementById('m-sublist');
+  if (!el) return;
+  el.innerHTML = editSubs.map((s, i) => `
+<div class="sublist-item">
+  <i class="ti ti-minus" style="font-size:12px;" aria-hidden="true"></i>
+  <span style="flex:1;">${s.title}</span>
+  <button class="icon-btn" onclick="removeSub(${i})" aria-label="Remover"><i class="ti ti-x" style="font-size:13px;"></i></button>
+</div>`).join('');
+}
+
+// Recria toda a interface com base no estado atual da aplicação.
+function render() {
+  const sorted = getSorted();
+  const pending = tasks.filter(t => !t.done).length;
+  const urgent = tasks.filter(t => !t.done && t.priority === 'alta').length;
+  const pendingLabel = pending === 0 ? 'Tudo em dia!' :
+    `${pending} pendente${pending > 1 ? 's' : ''}${urgent > 0 ? ` · ${urgent} urgente${urgent > 1 ? 's' : ''}` : ''}`;
+
+  document.getElementById('app').innerHTML = `
+<div class="header">
+  <div>
+    <div class="header-title"><i class="ti ti-clipboard-list" aria-hidden="true"></i>Minhas tarefas</div>
+    <div class="header-subtitle">${pendingLabel}</div>
+  </div>
+  <button class="btn-add" onclick="openModal()"><i class="ti ti-plus" aria-hidden="true"></i>Nova</button>
+</div>
+
+<div class="controls">
+  <div style="display:flex;gap:4px;">
+    ${['pendentes', 'todas', 'feitas'].map(v => `<button class="pill ${filterBy === v ? 'active' : ''}" onclick="setFilter('${v}')">${v.charAt(0).toUpperCase() + v.slice(1)}</button>`).join('')}
+  </div>
+  <div style="margin-left:auto;">
+    <select onchange="setSort(this.value)">
+      <option value="prioridade" ${sortBy === 'prioridade' ? 'selected' : ''}>Por prioridade</option>
+      <option value="prazo" ${sortBy === 'prazo' ? 'selected' : ''}>Por prazo</option>
+      <option value="recentes" ${sortBy === 'recentes' ? 'selected' : ''}>Mais recentes</option>
+    </select>
+  </div>
+</div>
+
+<div class="task-list">
+  ${sorted.length === 0
+    ? `<div class="empty">${filterBy === 'feitas' ? 'Nenhuma tarefa concluída ainda.' : 'Nenhuma tarefa. Adiciona uma!'}</div>`
+    : sorted.map(cardHTML).join('')}
+</div>
+
+${showModal ? modalHTML() : ''}
+`;
+  if (showModal) {
+    renderSublist();
+    setTimeout(() => { const el = document.getElementById('m-title'); if (el) el.focus(); }, 50);
+  }
+}
+
+// Ações expostas no objeto window para serem usadas diretamente nos handlers inline.
+window.toggleTask = function(id) { tasks = tasks.map(t => t.id === id ? { ...t, done: !t.done } : t); save(); };
+window.deleteTask = function(id) { if (!confirm('Excluir esta tarefa?')) return; tasks = tasks.filter(t => t.id !== id); save(); };
+window.toggleSub = function(tid, sid) { tasks = tasks.map(t => t.id === tid ? { ...t, subtasks: t.subtasks.map(s => s.id === sid ? { ...s, done: !s.done } : s) } : t); save(); };
+window.toggleExp = function(id) { if (expandedIds.has(id)) expandedIds.delete(id); else expandedIds.add(id); render(); };
+window.setFilter = function(v) { filterBy = v; render(); };
+window.setSort = function(v) { sortBy = v; render(); };
+window.openModal = function() { showModal = true; editSubs = []; render(); };
+window.closeModal = function() { showModal = false; editSubs = []; render(); };
+window.overlayClick = function(e) { if (e.target.id === 'modal-overlay') window.closeModal(); };
+window.addSub = function() {
+  const el = document.getElementById('m-sub');
+  if (!el || !el.value.trim()) return;
+  editSubs.push({ id: Date.now().toString(), title: el.value.trim(), done: false });
+  el.value = ''; renderSublist(); el.focus();
+};
+window.removeSub = function(i) { editSubs.splice(i, 1); renderSublist(); };
+window.subKey = function(e) { if (e.key === 'Enter') window.addSub(); };
+window.submitTask = function() {
+  const title = document.getElementById('m-title')?.value.trim();
+  if (!title) { document.getElementById('m-title')?.focus(); return; }
+  const prio = document.getElementById('m-prio')?.value || 'média';
+  const date = document.getElementById('m-date')?.value || '';
+  const notes = document.getElementById('m-notes')?.value.trim() || '';
+  tasks.push({ id: Date.now().toString(), title, priority: prio, dueDate: date, notes, subtasks: [...editSubs], done: false, createdAt: new Date().toISOString() });
+  showModal = false; editSubs = [];
+  save();
+};
+
+// Inicialização: carrega o que já existe salvo e desenha a tela.
+load();
+render();
+</script>
+</body>
+</html>
