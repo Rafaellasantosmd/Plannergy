@@ -4,7 +4,7 @@
 
 ### I built this for someone I love.
 
-A small, gentle planning tool I made for my autistic girlfriend — because she often overworks herself, forgets to rest, and pushes through her energy until she’s completely drained.
+A small, gentle planning tool I made for my autistic girlfriend, because she often overworks herself, forgets to rest, and pushes through her energy until she’s completely drained.
 
 Plannergy is my way of helping her see something I wish she could always feel:
 
