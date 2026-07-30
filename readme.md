@@ -124,10 +124,11 @@ It’s just a small digital space I made for someone I love, so she can look at 
 
 There’s nothing to install.
 
-Just open:
+Just open html!
 
+Also, heres the github pages for it:
 ```
-index.html
+[![Live Demo](https://img.shields.io/badge/Live-Demo-success?style=for-the-badge)](https://rafaellasantosmd.github.io/Plannergy/)
 ```
 
 That’s it.
