@@ -6,9 +6,7 @@
 
 A small, gentle planning tool I made for my autistic girlfriend, because she often overworks herself, forgets to rest, and pushes through her energy until she’s completely drained.
 
-Plannergy is my way of helping her see something I wish she could always feel:
-
-> **Your energy matters more than your productivity.**
+Plannergy is my way of helping her see that her wellbeing matters more than productivity.
 
 <img src="./docs/images/hero.png" alt="Plannergy Preview" width="900"/
 
