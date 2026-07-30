@@ -127,9 +127,9 @@ There’s nothing to install.
 Just open html!
 
 Also, heres the github pages for it:
-```
+
 [![Live Demo](https://img.shields.io/badge/Live-Demo-success?style=for-the-badge)](https://rafaellasantosmd.github.io/Plannergy/)
-```
+
 
 That’s it.
 
