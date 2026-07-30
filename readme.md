@@ -8,7 +8,7 @@ A small, gentle planning tool I made for my autistic girlfriend, because she oft
 
 Plannergy is my way of helping her see that her wellbeing matters more than productivity.
 
-<img src="./docs/images/hero.png" alt="Plannergy Preview" width="900"/
+<img src="./docs/images/hero.png" alt="Plannergy Preview" width="900">
 
 </div>
 
